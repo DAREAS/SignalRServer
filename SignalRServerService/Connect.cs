@@ -19,7 +19,6 @@ namespace SignalRServerService
         public Connect(string databaseName)
         {
             _dataBaseName = databaseName;
-            //_connectionString = "localhost:27017";
             _client = new MongoClient();
         }
 

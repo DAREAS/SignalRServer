@@ -14,10 +14,11 @@ namespace SignalRServerService
                 map.UseCors(CorsOptions.AllowAll);
                 var hubConfiguration = new HubConfiguration
                 {
-                    EnableJSONP = true
+                    EnableJSONP = true,
+                    EnableDetailedErrors = true,
+                    EnableJavaScriptProxies = false
                 };
-   
-                hubConfiguration.EnableDetailedErrors = true;
+  
                 map.RunSignalR(hubConfiguration);
             });
         }

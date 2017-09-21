@@ -91,11 +91,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connect.cs" />
-    <Compile Include="Entities\DataMember.cs" />
+    <Compile Include="Entities\DataMessage.cs" />
     <Compile Include="Entities\Element.cs" />
     <Compile Include="Hubs\EventStoreHub.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\ElementRepository.cs" />
+    <Compile Include="Repositories\IAbstractRepository.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,39 +1,62 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
-using Newtonsoft.Json;
 using SignalRServerService.Entities;
 
 namespace SignalRServerService.Hubs
 {
     public class EventStoreHub : Hub
     {
-        public void AddMessage(string name, string message)
+        public void AddMessage(string elementKey, string elementName, string message, string messageBody)
         {
-            var mongoDb = new Connect("messageQueue");
-            mongoDb.SetDataBase();
-            var collection = mongoDb.DataBase.GetCollection<DataMessage>("dataMessage");
-            //var filter = MongoDB.Driver.Builders<DataMessage>.Filter.Eq("dataMessage.Id", message);
-            //var currentEntity = collection.Find(filter);
+            try
+            {
+                var mongoDb = new Connect("messageQueue");
+                mongoDb.SetDataBase();
+                var collection = mongoDb.DataBase.GetCollection<Element>("elementMenssage");
+                var filter = Builders<Element>.Filter.Eq("Id", elementKey);
+                var update = Builders<Element>.Update.Push(element => element.DataMessage, new DataMessage{Message = message, MessageBody = messageBody});
 
-            //currentEntity.
+                collection.UpdateOne(filter, update);
 
-            //Console.WriteLine("Hub AddMessage {0} {1}\n", name, message);
-            Clients.All.addMessage(name, message);
+                Clients.Client(Context.ConnectionId).send($"Message add in => Element: {elementKey} - Message {messageBody}.");
+            }
+            catch (Exception exception)
+            {
+                Clients.Client(Context.ConnectionId).send($"Error on Message add. Exception: {exception}");
+
+                throw;
+            }
         }
 
         public void AddElement(string elementKey, string elementName, string elementBody)
         {
-            var mongoDb = new Connect("messageQueue");
-            mongoDb.SetDataBase();
-            var collection = mongoDb.DataBase.GetCollection<Element>("element");
+            try
+            {
+                var mongoDb = new Connect("messageQueue");
+                mongoDb.SetDataBase();
+                var collection = mongoDb.DataBase.GetCollection<Element>("element");
 
-            var newElement = JsonConvert.DeserializeObject<DataMessage>(elementBody);
+                var newElement = new Element
+                {
+                    Id = new ObjectId(),
+                    Name = elementName,
+                    BodyElement = elementBody,
+                    DataMessage = new List<DataMessage>()
+                };
 
+                collection.InsertOne(newElement);
+
+                Clients.Client(Context.ConnectionId).addElement(elementKey, elementName, "Body");
+            }
+            catch (Exception exception)
+            {
+                Clients.Client(Context.ConnectionId).addMessage(exception);
+                throw;
+            }
         }
 
         public override Task OnConnected()
