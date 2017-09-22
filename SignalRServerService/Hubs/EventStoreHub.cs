@@ -45,7 +45,21 @@ namespace SignalRServerService.Hubs
                     Id = new ObjectId(),
                     Name = elementName,
                     BodyElement = elementBody,
-                    DataMessage = new List<DataMessage>()
+                    NumeroAcesso = 1024,
+                    DataMessage = new List<DataMessage>
+                    {
+                        new DataMessage
+                        {
+                            Message = "Elemento Adicionado",
+                            MessageBody = $"name: {elementName}, modificado: true"
+                        },
+
+                        new DataMessage
+                        {
+                            Message = "Elemento Adicionado",
+                            MessageBody = $"name: {elementName}, modificado: false"
+                        }
+                    }
                 };
 
                 collection.InsertOne(newElement);
